@@ -1,0 +1,15 @@
+/cache/*
+graph/propel.schema.dotweb/sf
+apps/smint/config/app.yml
+apps/smint/config/security.yml
+web/.htaccess
+config/database.yml
+config/databases.yml
+apps/smint/config/factories.yml
+.project
+.settings/org.eclipse.core.resources.prefs
+web/smintplayer/css/Thumbs.db
+config/generated-metadata.schema.xml
+config/generated-sfGuardPlugin-schema.xml
+config/generated-smafe.schema.xml
+config/generated-userLogging.schema.xml

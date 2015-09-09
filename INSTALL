@@ -1,0 +1,85 @@
+
+--------------------------------------------------
+-- requirements
+--------------------------------------------------
+
+Working SEARCH by Sound backend (Smafe) installation
+
+symfony >= 1.4.13 available at the location configured in: 
+    config/ProjectConfiguration.class.php
+    
+php >= 5.2.4
+how to check: 
+php ../symfony_libs/vendor/symfony/data/bin/check_configuration.php    (or copy check_configuration.php to your webserver e.g. /var/www/)
+
+php gd
+(Debian/Ubuntu: sudo apt-get install php5-gd)
+
+PDO with postgres drivers
+
+ffmpeg
+
+
+--------------------------------------------------
+-- SYSTEM SETTINGS
+--------------------------------------------------
+
+IN PHP.INI set: 
+upload_max_filesize = 50M
+post_max_size = 50M
+
+in .htaccess set: 
+php_value upload_max_filesize 10M
+php_value post_max_size 10M
+
+
+--------------------------------------------------
+-- PROJECT SETTINGS
+--------------------------------------------------
+I) database
+    config/databases.yml
+    -> set dsn & username/password
+    (don't forget to check featurevector & distancetype settings in app.yml !!!)
+
+II) smafe settings 
+    apps/smint/config/app.yml
+    
+    a) smafe cli settings 
+        -> live_settings:
+        # check that -f (featurevectortype) is consistant with default/featurevectortypeid (in app.yml)
+        
+    b) featurevector-/distancetypesettings
+        -> defaults:
+        # check that -f (featurevectortype) is consistant with default/featurevectortypeid (in app.yml)
+        
+    c) mp3 path
+        -> mp3path:
+    
+optional:
+
+- change the disclaimer / content provider info on login page
+    apps/smint/config/app.yml
+        disclaimer:
+    
+
+
+
+
+--------------------------------------------------
+-- generate Users
+--------------------------------------------------
+
+./tools/createusers.sh
+
+
+
+
+--------------------------------------------------
+-- installing uploadprogress pecl package on mac -> might cause architecture problems - force 32 bit mode
+--------------------------------------------------
+cd uploadprogress-version
+/Applications/mappstack-1.2-5/php/bin/phpize
+MACOSX_DEPLOYMENT_TARGET=10.6 CFLAGS='-O3 -fno-common -arch i386 LDFLAGS='-O3 -arch i386 CXXFLAGS='-O3 -fno-common -arch i386' ./configure --with-php-config=/Applications/mappstack-1.2-5/php/bin/php-config
+make
+make install
+file  /Applications/mappstack-1.2-5/php/lib/php/extensions/uploadprogress.so

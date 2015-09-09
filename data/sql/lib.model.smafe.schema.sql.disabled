@@ -1,0 +1,377 @@
+-----------------------------------------------------------------------------
+-- smafe model will be created by smafe 
+-----------------------------------------------------------------------------
+
+-----------------------------------------------------------------------------
+-- collection
+-----------------------------------------------------------------------------
+
+DROP TABLE "collection" CASCADE;
+
+
+CREATE TABLE "collection"
+(
+	"id" serial  NOT NULL,
+	"collection_name" VARCHAR(255)  NOT NULL,
+	PRIMARY KEY ("id"),
+	CONSTRAINT "collection_collection_name_key" UNIQUE ("collection_name")
+);
+
+COMMENT ON TABLE "collection" IS '';
+
+
+SET search_path TO public;
+-----------------------------------------------------------------------------
+-- collection_file
+-----------------------------------------------------------------------------
+
+DROP TABLE "collection_file" CASCADE;
+
+
+CREATE TABLE "collection_file"
+(
+	"collection_id" INTEGER  NOT NULL,
+	"file_id" INTEGER  NOT NULL,
+	PRIMARY KEY ("collection_id","file_id")
+);
+
+COMMENT ON TABLE "collection_file" IS '';
+
+
+SET search_path TO public;
+-----------------------------------------------------------------------------
+-- config
+-----------------------------------------------------------------------------
+
+DROP TABLE "config" CASCADE;
+
+
+CREATE TABLE "config"
+(
+	"key" VARCHAR(255)  NOT NULL,
+	"value" VARCHAR(255),
+	"modified" TIMESTAMP default 'now()',
+	PRIMARY KEY ("key")
+);
+
+COMMENT ON TABLE "config" IS '';
+
+
+SET search_path TO public;
+-----------------------------------------------------------------------------
+-- distance
+-----------------------------------------------------------------------------
+
+DROP TABLE "distance" CASCADE;
+
+
+CREATE TABLE "distance"
+(
+	"track_a_id" INTEGER  NOT NULL,
+	"track_b_id" INTEGER  NOT NULL,
+	"featurevectortype_id" INTEGER  NOT NULL,
+	"distancetype_id" INTEGER  NOT NULL,
+	"value" VARCHAR(255),
+	"inserted" TIMESTAMP(-4),
+	"updated" TIMESTAMP(-4),
+	PRIMARY KEY ("track_a_id","track_b_id","featurevectortype_id","distancetype_id")
+);
+
+COMMENT ON TABLE "distance" IS '';
+
+
+SET search_path TO public;
+CREATE INDEX "distance_traid_fvtid_distid_valu" ON "distance" ("track_a_id","featurevectortype_id","distancetype_id","value");
+
+-----------------------------------------------------------------------------
+-- distancejob
+-----------------------------------------------------------------------------
+
+DROP TABLE "distancejob" CASCADE;
+
+
+CREATE TABLE "distancejob"
+(
+	"featurevectortype_id" INTEGER  NOT NULL,
+	"track_id" INTEGER  NOT NULL,
+	"distancetype_id" INTEGER  NOT NULL,
+	"smafejob_addfile_id" INTEGER,
+	"status" VARCHAR(255),
+	"priority" INTEGER default 0 NOT NULL,
+	"created" TIMESTAMP default 'now()' NOT NULL,
+	"started" TIMESTAMP,
+	"finished" TIMESTAMP,
+	PRIMARY KEY ("featurevectortype_id","track_id","distancetype_id")
+);
+
+COMMENT ON TABLE "distancejob" IS '';
+
+
+SET search_path TO public;
+CREATE INDEX "distancejobtable_fvtid_distid_tr" ON "distancejob" ("featurevectortype_id","distancetype_id","track_id","status");
+
+-----------------------------------------------------------------------------
+-- distancetype
+-----------------------------------------------------------------------------
+
+DROP TABLE "distancetype" CASCADE;
+
+
+CREATE TABLE "distancetype"
+(
+	"id" INTEGER  NOT NULL,
+	"inserted" TIMESTAMP(-4),
+	"updated" TIMESTAMP(-4),
+	"name" VARCHAR(255),
+	PRIMARY KEY ("id")
+);
+
+COMMENT ON TABLE "distancetype" IS '';
+
+
+SET search_path TO public;
+-----------------------------------------------------------------------------
+-- featurevector
+-----------------------------------------------------------------------------
+
+DROP TABLE "featurevector" CASCADE;
+
+
+CREATE TABLE "featurevector"
+(
+	"track_id" INTEGER  NOT NULL,
+	"featurevectortype_id" INTEGER  NOT NULL,
+	"data" BYTEA,
+	"file_id" INTEGER,
+	"inserted" TIMESTAMP(-4),
+	"updated" TIMESTAMP(-4),
+	PRIMARY KEY ("track_id","featurevectortype_id"),
+	CONSTRAINT "featurevector_track_id_featureve" UNIQUE ("track_id","featurevectortype_id")
+);
+
+COMMENT ON TABLE "featurevector" IS '';
+
+
+SET search_path TO public;
+-----------------------------------------------------------------------------
+-- featurevectorsegment
+-----------------------------------------------------------------------------
+
+DROP TABLE "featurevectorsegment" CASCADE;
+
+
+CREATE TABLE "featurevectorsegment"
+(
+	"segmentnr" INTEGER  NOT NULL,
+	"track_id" INTEGER  NOT NULL,
+	"featurevectortype_id" INTEGER  NOT NULL,
+	"data" BYTEA,
+	"file_id" INTEGER,
+	"startsample" INT8,
+	"length" INTEGER,
+	"inserted" TIMESTAMP(-4),
+	"updated" TIMESTAMP(-4),
+	PRIMARY KEY ("segmentnr","track_id","featurevectortype_id")
+);
+
+COMMENT ON TABLE "featurevectorsegment" IS '';
+
+
+SET search_path TO public;
+-----------------------------------------------------------------------------
+-- featurevectortype
+-----------------------------------------------------------------------------
+
+DROP TABLE "featurevectortype" CASCADE;
+
+
+CREATE TABLE "featurevectortype"
+(
+	"id" serial  NOT NULL,
+	"name" VARCHAR(255),
+	"version" INTEGER,
+	"dimension_x" INTEGER,
+	"dimension_y" INTEGER,
+	"parameters" VARCHAR(255),
+	"class_id" VARCHAR(255),
+	"inserted" TIMESTAMP(-4),
+	"updated" TIMESTAMP(-4),
+	PRIMARY KEY ("id")
+);
+
+COMMENT ON TABLE "featurevectortype" IS '';
+
+
+SET search_path TO public;
+-----------------------------------------------------------------------------
+-- file
+-----------------------------------------------------------------------------
+
+DROP TABLE "file" CASCADE;
+
+
+CREATE TABLE "file"
+(
+	"id" serial  NOT NULL,
+	"hash" VARCHAR(255),
+	"track_id" INTEGER,
+	"inserted" TIMESTAMP(-4) default 'now()',
+	"updated" TIMESTAMP(-4),
+	"input_format" VARCHAR(255),
+	"uri" VARCHAR(255),
+	"samplef" INTEGER,
+	"bitrate" INTEGER,
+	"channels" INTEGER,
+	"encoding" VARCHAR(255),
+	"samplebit" INTEGER,
+	"external_key" VARCHAR(255),
+	"guid" VARCHAR(255),
+	PRIMARY KEY ("id"),
+	CONSTRAINT "file_external_key_key" UNIQUE ("external_key"),
+	CONSTRAINT "file_guid_key" UNIQUE ("guid")
+);
+
+COMMENT ON TABLE "file" IS '';
+
+
+SET search_path TO public;
+CREATE INDEX "file_external_key_idx" ON "file" ("external_key");
+
+CREATE INDEX "file_track_id_idx" ON "file" ("track_id");
+
+-----------------------------------------------------------------------------
+-- smafejob_addfile
+-----------------------------------------------------------------------------
+
+DROP TABLE "smafejob_addfile" CASCADE;
+
+
+CREATE TABLE "smafejob_addfile"
+(
+	"id" serial  NOT NULL,
+	"priority" INTEGER default 0 NOT NULL,
+	"file_uri" VARCHAR(255),
+	"created" TIMESTAMP default 'now()' NOT NULL,
+	"started" TIMESTAMP,
+	"finished1" TIMESTAMP,
+	"started2" TIMESTAMP,
+	"finished2" TIMESTAMP,
+	"finished" TIMESTAMP,
+	"status" VARCHAR(255),
+	"collection_name" VARCHAR(255),
+	"log" VARCHAR(255),
+	"external_key" VARCHAR(255),
+	"guid" VARCHAR(255),
+	PRIMARY KEY ("id"),
+	CONSTRAINT "smafejob_external_key_key" UNIQUE ("external_key"),
+	CONSTRAINT "smafejob_guid_key" UNIQUE ("guid")
+);
+
+COMMENT ON TABLE "smafejob_addfile" IS '';
+
+
+SET search_path TO public;
+-----------------------------------------------------------------------------
+-- smafejob_deletecollection
+-----------------------------------------------------------------------------
+
+DROP TABLE "smafejob_deletecollection" CASCADE;
+
+
+CREATE TABLE "smafejob_deletecollection"
+(
+	"id" serial  NOT NULL,
+	"priority" INTEGER default 0 NOT NULL,
+	"collection_name" VARCHAR(255)  NOT NULL,
+	"created" TIMESTAMP default 'now()' NOT NULL,
+	"started" TIMESTAMP,
+	"finished1" TIMESTAMP,
+	"started2" TIMESTAMP,
+	"finished2" TIMESTAMP,
+	"finished" TIMESTAMP,
+	"status" VARCHAR(255),
+	"log" VARCHAR(255),
+	PRIMARY KEY ("id")
+);
+
+COMMENT ON TABLE "smafejob_deletecollection" IS '';
+
+
+SET search_path TO public;
+-----------------------------------------------------------------------------
+-- smafejob_deletefile
+-----------------------------------------------------------------------------
+
+DROP TABLE "smafejob_deletefile" CASCADE;
+
+
+CREATE TABLE "smafejob_deletefile"
+(
+	"id" serial  NOT NULL,
+	"priority" INTEGER default 0 NOT NULL,
+	"collection_name" VARCHAR(255),
+	"file_id" INTEGER,
+	"created" TIMESTAMP default 'now()' NOT NULL,
+	"started" TIMESTAMP,
+	"finished1" TIMESTAMP,
+	"started2" TIMESTAMP,
+	"finished2" TIMESTAMP,
+	"finished" TIMESTAMP,
+	"status" VARCHAR(255),
+	"log" VARCHAR(255),
+	PRIMARY KEY ("id")
+);
+
+COMMENT ON TABLE "smafejob_deletefile" IS '';
+
+
+SET search_path TO public;
+-----------------------------------------------------------------------------
+-- track
+-----------------------------------------------------------------------------
+
+DROP TABLE "track" CASCADE;
+
+
+CREATE TABLE "track"
+(
+	"id" serial  NOT NULL,
+	"fingerprint" VARCHAR(255),
+	"inserted" TIMESTAMP(-4),
+	"updated" TIMESTAMP(-4),
+	"mbid" INTEGER,
+	PRIMARY KEY ("id"),
+	CONSTRAINT "track_mbid_key" UNIQUE ("mbid")
+);
+
+COMMENT ON TABLE "track" IS '';
+
+
+SET search_path TO public;
+ALTER TABLE "collection_file" ADD CONSTRAINT "collection_file_FK_1" FOREIGN KEY ("collection_id") REFERENCES "collection" ("id") ON UPDATE CASCADE;
+
+ALTER TABLE "collection_file" ADD CONSTRAINT "collection_file_FK_2" FOREIGN KEY ("file_id") REFERENCES "file" ("id") ON UPDATE CASCADE;
+
+ALTER TABLE "distance" ADD CONSTRAINT "distance_FK_1" FOREIGN KEY ("track_a_id") REFERENCES "featurevector" ("track_id") ON UPDATE CASCADE ON DELETE RESTRICT;
+
+ALTER TABLE "distance" ADD CONSTRAINT "distance_FK_2" FOREIGN KEY ("track_b_id") REFERENCES "featurevector" ("track_id") ON UPDATE CASCADE ON DELETE RESTRICT;
+
+ALTER TABLE "distance" ADD CONSTRAINT "distance_FK_3" FOREIGN KEY ("distancetype_id") REFERENCES "distancetype" ("id") ON UPDATE CASCADE ON DELETE RESTRICT;
+
+ALTER TABLE "distancejob" ADD CONSTRAINT "distancejob_FK_1" FOREIGN KEY ("track_id") REFERENCES "featurevector" ("track_id") ON UPDATE CASCADE ON DELETE RESTRICT;
+
+ALTER TABLE "distancejob" ADD CONSTRAINT "distancejob_FK_2" FOREIGN KEY ("distancetype_id") REFERENCES "distancetype" ("id") ON UPDATE CASCADE ON DELETE RESTRICT;
+
+ALTER TABLE "distancejob" ADD CONSTRAINT "distancejob_FK_3" FOREIGN KEY ("smafejob_addfile_id") REFERENCES "smafejob_addfile" ("id") ON UPDATE CASCADE ON DELETE RESTRICT;
+
+ALTER TABLE "featurevector" ADD CONSTRAINT "featurevector_FK_1" FOREIGN KEY ("track_id") REFERENCES "track" ("id") ON UPDATE CASCADE ON DELETE RESTRICT;
+
+ALTER TABLE "featurevector" ADD CONSTRAINT "featurevector_FK_2" FOREIGN KEY ("featurevectortype_id") REFERENCES "featurevectortype" ("id") ON UPDATE CASCADE ON DELETE RESTRICT;
+
+ALTER TABLE "featurevector" ADD CONSTRAINT "featurevector_FK_3" FOREIGN KEY ("file_id") REFERENCES "file" ("id") ON UPDATE CASCADE ON DELETE RESTRICT;
+
+ALTER TABLE "featurevectorsegment" ADD CONSTRAINT "featurevectorsegment_FK_1" FOREIGN KEY ("track_id") REFERENCES "featurevector" ("track_id") ON UPDATE CASCADE ON DELETE RESTRICT;
+
+ALTER TABLE "featurevectorsegment" ADD CONSTRAINT "featurevectorsegment_FK_2" FOREIGN KEY ("file_id") REFERENCES "file" ("id") ON UPDATE CASCADE ON DELETE RESTRICT;
+
+ALTER TABLE "file" ADD CONSTRAINT "file_FK_1" FOREIGN KEY ("track_id") REFERENCES "track" ("id") ON UPDATE CASCADE ON DELETE RESTRICT;

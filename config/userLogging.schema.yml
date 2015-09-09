@@ -1,0 +1,63 @@
+propel:
+  _attributes:      { package: lib.model.userLogging }
+  smint_user:
+    _attributes: { phpName: SmintUser }
+    id:           {type: integer, required: true, primaryKey: true, autoIncrement: true }
+    sf_guard_user_id: {type: integer}
+    username:     {type: varchar(255)}
+    name:         {type: varchar(255)}
+    email:        {type: varchar(255), index: yes}
+    organization: {type: varchar(255)}
+    role:         {type: varchar(255)}
+    industry:     {type: varchar(255)}
+    validate:
+          type: varchar(255)
+          index: yes
+    created_at:
+    updated_at:
+
+  smint_userlogins:
+    _attributes:  { phpName: UserLogins }
+    id:
+    smint_user_id:     
+    ip:           {type: varchar(255)}
+    created_at:
+    
+  smint_comment:
+    _attributes:  { phpName: GeneralComment }
+    id:
+    smint_user_id:     
+    content:      longvarchar
+    created_at:
+      
+
+  # smint_actionlog:
+  #   _attributes:  { phpName: ActionLog }
+  #   id:
+  #   smint_user_id:     
+  #   action:       longvarchar
+  #   details:      longvarchar
+  #   created_at:
+
+  smint_querycomment:
+    _attributes:  { phpName: QueryComment }
+    id:
+    smint_user_id:
+    querytrackid:       integer
+    comment:            longvarchar
+    rating:             float
+    featurevectortypeid:    integer
+    distancetypeid:     integer
+    created_at:
+    updated_at: 
+      
+  smint_querycomment_track:
+    _attributes:  { phpName: QueryCommentTrack }
+    id:
+    smint_querycomment_id:
+    resultposition:     integer
+    resulttrackid:      integer
+    comment:            longvarchar
+    rating:             float
+    created_at:
+    updated_at: 

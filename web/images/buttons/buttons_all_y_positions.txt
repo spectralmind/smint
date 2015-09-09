@@ -1,0 +1,54 @@
+
+
+x = always 0
+y - positions are:
+
+
+btn_play_51x51
+0 px
+
+btn_pause_51x51
+-52 px
+
+btn_stop_51x51
+-104 px    btn_back_34x34
+-156 pxbtn_forw_34x34
+-192 px
+
+btn_center_26x26
+-228 px
+
+btn_zoom_in_26x26
+-256 px
+
+btn_zoom_out_26x26
+-284 pxbtn_clear_30x30
+-312 pxbtn_folder_30x30
+-344 px
+
+btn_dropdown_28x28
+-376 px
+
+btn_volume_18x15
+-406 px
+
+btn_vol_bar_clear_52x9
+-426 px
+
+btn_vol_bar_full_52x9
+-438 px
+
+btn_star_clear_19x16
+-450 px
+
+btn_star_full_19x16
+-468 px
+
+btn_search_93x33
+-486 px
+
+btn_fov_handle_56x20
+-520 px
+
+btn_search_similar_140x31
+-541 px

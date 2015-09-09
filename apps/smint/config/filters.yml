@@ -1,0 +1,18 @@
+# You can find more information about this file on the symfony website:
+# http://www.symfony-project.org/reference/1_4/en/12-Filters
+
+rendering: ~
+remember_me:
+  class: mysfGuardRememberMeFilter  
+security:  ~
+
+# insert your own filters here
+log:
+  class: logUseractionsFilter
+  param: 
+    enable_logging: true
+
+cache:     ~
+common:
+  class: sfCommonFilter
+execution: ~

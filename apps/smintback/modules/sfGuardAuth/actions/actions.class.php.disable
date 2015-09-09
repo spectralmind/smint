@@ -1,0 +1,99 @@
+<?php
+
+/*
+ * This file is part of the symfony package.
+ * (c) 2004-2006 Fabien Potencier <fabien.potencier@symfony-project.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+require_once(dirname(__FILE__).'/../../../../../plugins/sfGuardPlugin/modules/sfGuardAuth/lib/BasesfGuardAuthActions.class.php');
+
+/**
+ *
+ * @package    symfony
+ * @subpackage plugin
+ * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @version    SVN: $Id: actions.class.php 9999 2008-06-29 21:24:44Z fabien $
+ */
+class sfGuardAuthActions extends BasesfGuardAuthActions
+{
+  public function executeSignout($request) {
+    $this->getUser()->getAttributeHolder()->clear();
+    return parent::executeSignout($request);
+  }
+  
+  public function executeSignin($request) {
+    $class = sfConfig::get('app_sf_guard_plugin_signin_form', 'sfGuardFormSignin');
+    $this->form = new $class();
+    
+    if ($request->isMethod('post'))
+    {
+      $this->formdata = $request->getParameter('signin');
+      mysfLog::log($this, "my signin. post data: " . print_r($request->getParameterHolder(),true)  );
+      mysfLog::log($this, "my signin. form data: " . print_r($this->formdata,true) );
+  
+      mysfLog::log($this, "my signin. form is bound: " . $this->form->isBound() );
+  
+      $this->form->bind($this->formdata);
+      mysfLog::log($this, "my signin. form is bound: " . $this->form->isBound() );
+      mysfLog::log($this, "my signin. form is valid: " . $this->form->isValid() );
+      mysfLog::log($this, "my signin. form name: " . print_r($this->form->getName(),true) );
+  
+  
+      mysfLog::log($this, "my signin. form data: " . print_r($this->form->getValues(),true)  );
+      mysfLog::log($this, "my signin. form data username: " . print_r($this->form->getValue("username"),true)  );
+      mysfLog::log($this, "my signin. form defaults: " . print_r($this->form->getDefaults(),true)  );
+      
+      if ($this->form->isValid())
+      {
+        mysfLog::log($this, "my signin. form valid" );
+        
+        $values = $this->form->getValues();
+        
+        $existingUser = SmintUserPeer::retrieveByUniqueColumnValues($values['username'],$values['name'],$values['email'],$values['organization']);
+        
+        if (is_null($existingUser)) {
+          mysfLog::log($this, "my signin. trying to store user" );
+          // store user in db
+          $newUser = new SmintUser();
+          $newUser->fromArray($values, BasePeer::TYPE_FIELDNAME); //sets database entry from from array
+          $newUser->save();
+          $newUser->reload();
+          $userid = $newUser->getId();
+          // since the form is evaluated another time by the parent class we need to remember, that the user is new
+          $this->getUser()->setAttribute('newuser',true);
+        } else {
+          mysfLog::log($this, "my signin. trying use existing user" );
+          $userid = $existingUser->getId();
+        }
+  
+  
+        // set user session Attributes
+        $this->getUser()->setAttribute('userid',$userid);
+        $this->getUser()->setAttribute('username', $values['username']);
+        $this->getUser()->setAttribute('name', $values['name']);
+        $this->getUser()->setAttribute('email', $values['email']);
+        $this->getUser()->setAttribute('organization', $values['organization']);
+        $this->getUser()->setAttribute('ip', $this->getRequest()->getHttpHeader ('addr','remote'));
+        
+        // store cookie to remember user
+        $this->getResponse()->setCookie('sfSmintUserId', $userid);
+        
+        // log user login
+        UserLoginsPeer::login();
+      }
+      mysfLog::log($this, "my signout. form INvalid" );
+      
+    }
+    
+    return parent::executeSignin($request);
+  
+    // // if a new user was created go on 
+    // if (isset($newUser)) parent::executeSignin($request);
+    // // otherwise ask if the existing user should be used; 
+    // $ws = $this->form->getWidgetSchema()->getFields();
+    // $ws['organization'] = "here we go";
+  }  
+}

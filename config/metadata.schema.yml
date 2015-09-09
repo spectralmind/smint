@@ -1,0 +1,20 @@
+propel:
+  _attributes:
+    package: lib.model.metadata
+    defaultIdMethod: native
+  filedesc:
+    _attributes: { phpName: Filedesc }
+    tracknr: { type: VARCHAR, primaryKey: true, required: true }
+    performers: { type: LONGVARCHAR, required: false }
+    title: { type: LONGVARCHAR, required: false }
+    version: { type: LONGVARCHAR, required: false }
+    genre: { type: LONGVARCHAR, required: false }
+    subgenre: { type: LONGVARCHAR, required: false }
+    tempo: { type: LONGVARCHAR, required: false }
+    bpm: { type: INTEGER, required: false }
+    leadvocalgender: { type: LONGVARCHAR, required: false }
+    instruments: { type: LONGVARCHAR, required: false }
+    moods: { type: LONGVARCHAR, required: false }
+    situations: { type: LONGVARCHAR, required: false }
+    genre_sm: { type: LONGVARCHAR, required: false }
+    genre_sm2: { type: LONGVARCHAR, required: false }

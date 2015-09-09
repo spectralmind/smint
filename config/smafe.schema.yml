@@ -1,0 +1,149 @@
+propel:
+  _attributes:
+    package: lib.model.smafe
+    defaultIdMethod: native
+  collection:
+    _attributes: { phpName: Collection }
+    id: { phpName: Id, type: INTEGER, primaryKey: true, autoIncrement: true, required: true }
+    collection_name: { phpName: CollectionName, type: VARCHAR, required: true }
+    _uniques: { collection_collection_name_key: [collection_name] }
+  collection_file:
+    _attributes: { phpName: CollectionFile }
+    collection_id: { phpName: CollectionId, type: INTEGER, primaryKey: true, required: true, foreignTable: collection, foreignReference: id, onUpdate: CASCADE }
+    file_id: { phpName: FileId, type: INTEGER, primaryKey: true, required: true, foreignTable: file, foreignReference: id, onUpdate: CASCADE }
+  config:
+    _attributes: { phpName: Config }
+    key: { phpName: Key, type: VARCHAR, primaryKey: true, required: true }
+    value: { phpName: Value, type: VARCHAR, required: false }
+    modified: { phpName: Modified, type: TIMESTAMP, required: false, defaultValue: now() }
+  distance:
+    _attributes: { phpName: Distance }
+    track_a_id: { phpName: TrackAId, type: INTEGER, primaryKey: true, required: true, foreignTable: featurevector, foreignReference: track_id, onDelete: RESTRICT, onUpdate: CASCADE }
+    track_b_id: { phpName: TrackBId, type: INTEGER, primaryKey: true, required: true, foreignTable: featurevector, foreignReference: track_id, onDelete: RESTRICT, onUpdate: CASCADE }
+    featurevectortype_id: { phpName: FeaturevectortypeId, type: INTEGER, primaryKey: true, required: true }
+    distancetype_id: { phpName: DistancetypeId, type: INTEGER, primaryKey: true, required: true, foreignTable: distancetype, foreignReference: id, onDelete: RESTRICT, onUpdate: CASCADE }
+    value: { phpName: Value, type: VARCHAR, required: false }
+    inserted: { phpName: Inserted, type: TIMESTAMP, size: '-4', required: false }
+    updated: { phpName: Updated, type: TIMESTAMP, size: '-4', required: false }
+    _indexes: { distance_traid_fvtid_distid_valu: [track_a_id, featurevectortype_id, distancetype_id, value] }
+  distancejob:
+    _attributes: { phpName: Distancejob }
+    featurevectortype_id: { phpName: FeaturevectortypeId, type: INTEGER, primaryKey: true, required: true }
+    track_id: { phpName: TrackId, type: INTEGER, primaryKey: true, required: true, foreignTable: featurevector, foreignReference: track_id, onDelete: RESTRICT, onUpdate: CASCADE }
+    distancetype_id: { phpName: DistancetypeId, type: INTEGER, primaryKey: true, required: true, foreignTable: distancetype, foreignReference: id, onDelete: RESTRICT, onUpdate: CASCADE }
+    smafejob_addfile_id: { phpName: SmafejobAddfileId, type: INTEGER, required: false, foreignTable: smafejob_addfile, foreignReference: id, onDelete: RESTRICT, onUpdate: CASCADE }
+    status: { phpName: Status, type: VARCHAR, required: false }
+    priority: { phpName: Priority, type: INTEGER, required: true, defaultValue: '0' }
+    created: { phpName: Created, type: TIMESTAMP, required: true, defaultValue: now() }
+    started: { phpName: Started, type: TIMESTAMP, required: false }
+    finished: { phpName: Finished, type: TIMESTAMP, required: false }
+    _indexes: { distancejobtable_fvtid_distid_tr: [featurevectortype_id, distancetype_id, track_id, status] }
+  distancetype:
+    _attributes: { phpName: Distancetype }
+    id: { phpName: Id, type: INTEGER, primaryKey: true, required: true }
+    inserted: { phpName: Inserted, type: TIMESTAMP, size: '-4', required: false }
+    updated: { phpName: Updated, type: TIMESTAMP, size: '-4', required: false }
+    name: { phpName: Name, type: VARCHAR, required: false }
+  featurevector:
+    _attributes: { phpName: Featurevector }
+    track_id: { phpName: TrackId, type: INTEGER, primaryKey: true, required: true, foreignTable: track, foreignReference: id, onDelete: RESTRICT, onUpdate: CASCADE }
+    featurevectortype_id: { phpName: FeaturevectortypeId, type: INTEGER, primaryKey: true, required: true, foreignTable: featurevectortype, foreignReference: id, onDelete: RESTRICT, onUpdate: CASCADE }
+    data: { phpName: Data, type: BLOB, required: false }
+    file_id: { phpName: FileId, type: INTEGER, required: false, foreignTable: file, foreignReference: id, onDelete: RESTRICT, onUpdate: CASCADE }
+    inserted: { phpName: Inserted, type: TIMESTAMP, size: '-4', required: false }
+    updated: { phpName: Updated, type: TIMESTAMP, size: '-4', required: false }
+    _uniques: { featurevector_track_id_featureve: [track_id, featurevectortype_id] }
+  featurevectorsegment:
+    _attributes: { phpName: Featurevectorsegment }
+    segmentnr: { phpName: Segmentnr, type: INTEGER, primaryKey: true, required: true }
+    track_id: { phpName: TrackId, type: INTEGER, primaryKey: true, required: true, foreignTable: featurevector, foreignReference: track_id, onDelete: RESTRICT, onUpdate: CASCADE }
+    featurevectortype_id: { phpName: FeaturevectortypeId, type: INTEGER, primaryKey: true, required: true }
+    data: { phpName: Data, type: BLOB, required: false }
+    file_id: { phpName: FileId, type: INTEGER, required: false, foreignTable: file, foreignReference: id, onDelete: RESTRICT, onUpdate: CASCADE }
+    startsample: { phpName: Startsample, type: BIGINT, required: false }
+    length: { phpName: Length, type: INTEGER, required: false }
+    inserted: { phpName: Inserted, type: TIMESTAMP, size: '-4', required: false }
+    updated: { phpName: Updated, type: TIMESTAMP, size: '-4', required: false }
+  featurevectortype:
+    _attributes: { phpName: Featurevectortype }
+    id: { phpName: Id, type: INTEGER, primaryKey: true, autoIncrement: true, required: true }
+    name: { phpName: Name, type: VARCHAR, required: false }
+    version: { phpName: Version, type: INTEGER, required: false }
+    dimension_x: { phpName: DimensionX, type: INTEGER, required: false }
+    dimension_y: { phpName: DimensionY, type: INTEGER, required: false }
+    parameters: { phpName: Parameters, type: VARCHAR, required: false }
+    class_id: { phpName: ClassId, type: VARCHAR, required: false }
+    inserted: { phpName: Inserted, type: TIMESTAMP, size: '-4', required: false }
+    updated: { phpName: Updated, type: TIMESTAMP, size: '-4', required: false }
+  file:
+    _attributes: { phpName: File }
+    id: { phpName: Id, type: INTEGER, primaryKey: true, autoIncrement: true, required: true }
+    hash: { phpName: Hash, type: VARCHAR, required: false }
+    track_id: { phpName: TrackId, type: INTEGER, required: false, foreignTable: track, foreignReference: id, onDelete: RESTRICT, onUpdate: CASCADE }
+    inserted: { phpName: Inserted, type: TIMESTAMP, size: '-4', required: false, defaultValue: now() }
+    updated: { phpName: Updated, type: TIMESTAMP, size: '-4', required: false }
+    input_format: { phpName: InputFormat, type: VARCHAR, required: false }
+    uri: { phpName: Uri, type: VARCHAR, required: false }
+    samplef: { phpName: Samplef, type: INTEGER, required: false }
+    bitrate: { phpName: Bitrate, type: INTEGER, required: false }
+    channels: { phpName: Channels, type: INTEGER, required: false }
+    encoding: { phpName: Encoding, type: VARCHAR, required: false }
+    samplebit: { phpName: Samplebit, type: INTEGER, required: false }
+    external_key: { phpName: ExternalKey, type: VARCHAR, required: false }
+    guid: { phpName: Guid, type: VARCHAR, required: false }
+    _indexes: { file_external_key_idx: [external_key], file_track_id_idx: [track_id] }
+    _uniques: { file_external_key_key: [external_key], file_guid_key: [guid] }
+  smafejob_addfile:
+    _attributes: { phpName: SmafejobAddfile }
+    id: { phpName: Id, type: INTEGER, primaryKey: true, autoIncrement: true, required: true }
+    priority: { phpName: Priority, type: INTEGER, required: true, defaultValue: '0' }
+    file_uri: { phpName: FileUri, type: VARCHAR, required: false }
+    created: { phpName: Created, type: TIMESTAMP, required: true, defaultValue: now() }
+    started: { phpName: Started, type: TIMESTAMP, required: false }
+    finished1: { phpName: Finished1, type: TIMESTAMP, required: false }
+    started2: { phpName: Started2, type: TIMESTAMP, required: false }
+    finished2: { phpName: Finished2, type: TIMESTAMP, required: false }
+    finished: { phpName: Finished, type: TIMESTAMP, required: false }
+    status: { phpName: Status, type: VARCHAR, required: false }
+    collection_name: { phpName: CollectionName, type: VARCHAR, required: false }
+    log: { phpName: Log, type: VARCHAR, required: false }
+    external_key: { phpName: ExternalKey, type: VARCHAR, required: false }
+    guid: { phpName: Guid, type: VARCHAR, required: false }
+    _uniques: { smafejob_external_key_key: [external_key], smafejob_guid_key: [guid] }
+  smafejob_deletecollection:
+    _attributes: { phpName: SmafejobDeletecollection }
+    id: { phpName: Id, type: INTEGER, primaryKey: true, autoIncrement: true, required: true }
+    priority: { phpName: Priority, type: INTEGER, required: true, defaultValue: '0' }
+    collection_name: { phpName: CollectionName, type: VARCHAR, required: true }
+    created: { phpName: Created, type: TIMESTAMP, required: true, defaultValue: now() }
+    started: { phpName: Started, type: TIMESTAMP, required: false }
+    finished1: { phpName: Finished1, type: TIMESTAMP, required: false }
+    started2: { phpName: Started2, type: TIMESTAMP, required: false }
+    finished2: { phpName: Finished2, type: TIMESTAMP, required: false }
+    finished: { phpName: Finished, type: TIMESTAMP, required: false }
+    status: { phpName: Status, type: VARCHAR, required: false }
+    log: { phpName: Log, type: VARCHAR, required: false }
+  smafejob_deletefile:
+    _attributes: { phpName: SmafejobDeletefile }
+    id: { phpName: Id, type: INTEGER, primaryKey: true, autoIncrement: true, required: true }
+    priority: { phpName: Priority, type: INTEGER, required: true, defaultValue: '0' }
+    collection_name: { phpName: CollectionName, type: VARCHAR, required: false }
+    file_id: { phpName: FileId, type: INTEGER, required: false }
+    created: { phpName: Created, type: TIMESTAMP, required: true, defaultValue: now() }
+    started: { phpName: Started, type: TIMESTAMP, required: false }
+    finished1: { phpName: Finished1, type: TIMESTAMP, required: false }
+    started2: { phpName: Started2, type: TIMESTAMP, required: false }
+    finished2: { phpName: Finished2, type: TIMESTAMP, required: false }
+    finished: { phpName: Finished, type: TIMESTAMP, required: false }
+    status: { phpName: Status, type: VARCHAR, required: false }
+    log: { phpName: Log, type: VARCHAR, required: false }
+  track:
+    _attributes: { phpName: Track }
+    id: { phpName: Id, type: INTEGER, primaryKey: true, autoIncrement: true, required: true }
+    fingerprint: { phpName: Fingerprint, type: VARCHAR, required: false }
+    inserted: { phpName: Inserted, type: TIMESTAMP, size: '-4', required: false }
+    updated: { phpName: Updated, type: TIMESTAMP, size: '-4', required: false }
+    mbid: { phpName: Mbid, type: INTEGER, required: false }
+    _uniques: { track_mbid_key: [mbid] }
+
+

@@ -1,0 +1,73 @@
+# for development: download is NOT secure!
+
+# currently available credentials
+
+# - access (login) - automatically assigned to all users so no explicit action is defined
+# - writeAnnotations (allows you also to read your own annotations)
+# - readAnnotations (allows you to read all annotations)
+# - viewFeatures (also applies to Tags, or future feature types)
+# - executeSQL (some features may depend on this action - like the statistic page)
+# - playAudio (access mp3 files)
+# - admin (enables all other and some additional actions)
+ 
+# all these access rights depend on actions that do not hide any gui
+# component, but check the user's access approvals before executing the
+# actions. if a related gui component is shown and activated by the user the
+# user will be informed that he has no right to perform the action.
+
+default:
+  is_secure: true
+  # [ admin, editor ]              # admin AND editor
+  # [[ admin, superuser ]]         # admin OR superuser
+  # [[root, [supplier, [owner, quasiowner]], accounts]] # root OR (supplier AND (owner OR quasiowner)) OR accounts
+
+
+apply:
+  is_secure: false
+confirm:
+  is_secure: false
+tos:
+  is_secure: false
+technical:
+  is_secure: false
+
+
+
+sqlQuerySimple:
+  is_secure: true
+  #credentials: executeSQL
+
+
+# THIS IS FOR DEVELOPING!
+download:
+  is_secure: false
+  #credentials: playAudio
+
+getTags:
+  is_secure: true
+  #credentials: viewFeatures
+  
+springgraph:
+  is_secure: true
+  credentials: viewFeatures
+  
+getfeaturevector:
+  is_secure: true
+  credentials: viewFeatures
+ 
+# feedback 
+general:
+  is_secure: true
+  #credentials: writeAnnotations
+  
+text:  
+  is_secure: true
+  #credentials: writeAnnotations
+  
+rating:  
+  is_secure: true
+  #credentials: writeAnnotations
+  
+#prepared Test
+thankyou:
+  is_secure: false

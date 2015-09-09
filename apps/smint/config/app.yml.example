@@ -1,0 +1,377 @@
+# You can find more information about this file on the symfony website:
+# http://www.symfony-project.org/reference/1_4/en/11-App
+
+all:
+
+############################ 
+# User management related settings 
+############################ 
+  
+  sf_guard_plugin:
+    signin_form: LoginForm
+    profile_class: SmintUser
+    profile_field_name: sf_guard_user_id
+
+  login_settings:
+    confirm_existing_users: false
+
+  mail:
+    host:       dd1000.kasserver.com
+    port:       25
+    encryption: ~
+    username:   xx
+    password:   yy
+    from:     searchbysound@spectralmind.com
+    fromname: SEARCH by Sound Spectralmind platform
+
+############################ 
+# Settings for LIVE Queries  
+############################ 
+
+  live_settings:
+    # path for client installation of smafe (all commands below are seen relative to this path)
+    # TODO: this does not work currently: please edit the path in all occurances.
+    # currently: 6 times!
+    smafehome: '/home/ewald/code/client-installations/forsmintdevenv'
+    
+    #used to query for an uploaded file
+    # Variables:
+    # - $LIVEFILE
+    command: '/home/ewald/code/client-installations/forsmintdevenv/bin/smafewrapd.sh  --live --no-daemon --liveport 1250 --livefile="$LIVEFILE"'
+    
+    # This command is executed for segmented search
+    # If your database does not have segmented results you should use the same port as above - this will
+    # return full track results but at least the user can have a segmented _query_
+    # Variables:
+    # - $BEGINTIME
+    # - $ENDTIME
+    # - $LIVEFILE
+    # port 1251
+    command_segmentedsearch: 
+      '/home/ewald/code/client-installations/forsmintdevenv/bin/smafewrapd-live-segmented-file.sh --livebegintime $BEGINTIME --liveendtime $ENDTIME --livefile "$LIVEFILE" --liveport 1251'
+    
+    # --log needs to be the last option with no trailing space '.... --log='
+    # used to start the server
+    # check that -f (featurevectortype) is consitant with default/featurevectortypeid (in app.yml)
+    # without segments: port 1250
+    server_command:                 '/home/ewald/code/client-installations/forsmintdevenv/bin/smafedistd.sh --live --dbconf=/home/ewald/code/client-installations/forsmintdevenv/config/localhost-pumpaudio-2011-09-segments-part-smurf.opt              --liveport 1250 -f 2 --log='
+    # with segments: port 1251
+    server_command_segmentedsearch: '/home/ewald/code/client-installations/forsmintdevenv/bin/smafedistd.sh --live --dbconf=/home/ewald/code/client-installations/forsmintdevenv/config/localhost-pumpaudio-2011-09-segments-part-smurf.opt --segmentfvs --liveport 1251 -f 2 --log='
+
+
+
+############################ 
+# Settings for file conversion and other tasks  
+############################ 
+
+  conversion_setting:
+    #used to convert file to other format. OGG. variables that are replaced: $INfile, $OUTfile
+    command_ogg: 'ffmpeg -y -i "$INfile" -acodec vorbis "$OUTfile"'
+    #used to convert file to other format. MP3 variables that are replaced: $INfile, $OUTfile
+    command_mp3: 'ffmpeg -y -i "$INfile" "$OUTfile"'
+    #used to convert file to other format. Waveform in JSON format.
+    # variables that are replaced: $INfile, $OUTfile
+    command_waveform: sox  -t mp3 "$INfile"  -b 8  -c 1 -t s8 - rate -q 6 | hexdump -v -e '1/1 "%1d, "'   |sed 's/\(.*\)../\1/'    > "$OUTfile"
+    # This command is actually never used
+    command_png: never used
+    # tuned-audio-waveform
+#    command_json: tuned-audio-waveform --audio-input-file "$INfile" --waveform-output-file="$OUTfile" --waveform-output-format=json --waveform-range-total=200 --audio-calculation-method=volume-rms --waveform-pixels-per-second=6
+
+
+
+
+
+############################ 
+# Default Values & Constants 
+############################ 
+
+  defaults:
+    # set query defaults (and permanent settings if form field is disabled for user)
+    distancetypeid: 2
+    featurevectortypeid: 2
+# ssd for pumpaudio-2011-09-segments db
+
+    # Sets aglorithm for aggregating the results of segmented query
+    # possible values are
+    # 0 ... no aggregation (tracks appear multiple times in result)
+    # other values ... please refer to specification document for SMITN segmented search concept
+    segm_search_aggregation_algo: 0
+    
+        
+    # Sets aglorithm for aggregating the results of segmented query
+    # possible values are
+    # 0 ... no aggregation (tracks appear multiple times in result)
+    # other values ... please refer to specification document for SMITN segmented search concept
+    segm_search_aggregation_algo: 0
+    
+    # pixels per second: resolution of waveform
+    # NOTE: please use tools/mycc.sh to delete all *waveform files in web/uploads if you chnage this setting
+    waveform_resolution: 50
+    # the factor to rise the original waveform to the power.
+    # used in smintplayer like this: x^FACTOR
+    waveform_factor: 0.8
+
+  homepage:             search/index
+  
+  #allows enabling (true/false) ui effects (may result in reduced performance e.g. on mac with firefox)
+  visualeffects:        true
+
+# distance value normalization
+# values are used for linear transformation, the results are displayed if the column value_normalized is enabled(true)
+# all (distance) values will be divided by the constant. for values larger than the constant the result will always be 1. 
+  normalization:
+    constant: 600 
+
+  email:
+    siteadmin: support@spectralmind.com
+    evalfeedback: support@spectralmind.com
+    
+# default count used for ajax queries in autocomplete fields     
+  ajax:
+    autocomplete_results: 4
+
+############################ 
+# disclaimer text shown on login page  
+############################
+
+  disclaimer:
+    #text:   'This application is exclusively for evaluation purposes and may only be used by users with valid access codes obtained by <a href="http://www.spectralmind.com" target="_blank">spectralmind</a>.'
+    text: >
+          This service is provided for evaluation purposes only and may only be used by parties specifically authorized by Spectralmind. 
+          By using this service you agree that you do not use this service for other purposes beyond evaluation and do not redistribute or share login information with other parties. 
+          Under no circumstances you are entitled to download or otherwise process any data (content or meta-data) from this service. 
+          <br><br> 
+          If you have any questions concerning these terms please contact us at office@spectralmind.com. 
+          <br><br> 
+          All rights reserved © 2011 Spectralmind
+
+     
+    content_text: audio files provided by
+    content_image: getty_logo_105_40.png.png
+    content_link: https://secure.gettyimages.co.uk/music
+
+############################ 
+# MP3 Player and Security Settings   
+############################
+
+  files:
+    #set path to folder where the files can be found
+    #only this folder will be served by smint/getAudioFile/download 
+    # e.g. /Users/jochum/projects/spectralmind/noarbmp3sample/
+    # as well as the folder where uploaded files are stored
+    mp3path:            /data/music2/pumpaudio/convertedmp3/
+  
+  mp3player:
+    # one of: worldpress, flash-mp3-player, smintplayer
+    defaultplayer:      smintplayer
+    flash-mp3-player:
+      autoplay:         '1'
+      width:            '150'
+      img:              'flash-mp3-player-150.png'
+      imgmouseover:     'flash-mp3-player-150-mouseover.png'
+    worldpress:
+      autostart:        'yes'
+      width:            '180'
+      img:              'worldpress-180.png'
+      imgmouseover:     'worldpress-180-mouseover.png'
+      skin:             'bg: "FBF390",leftbg : "424242",lefticon: "ffffff",rightbg: "424242",righticon:"ffffff",rightbghover:"999999", righticonhover:"424242",voltrack: "ffffff",volslider:"FBF390",track:"FBF390",tracker:"928D0C"'
+    smintplayer:
+      autostart:        'no'
+      width:            '180'
+
+############################ 
+# View Configuration   
+############################
+
+# enable/disable columns (true/false) if a column is not shown it might not be implemented yet, 
+# if a column is disabled the query parameter will also be not shown
+# the default view will be used if no specific view for a userGroup can be found 
+  view:
+    options:
+      searchsimilar: true
+      searchleastsimilar: false
+      addtoquery: false
+    columns:
+      resultposition: false
+      tracknr: false
+      value: false
+      value_normalized: false 
+      featurevectorlink: false
+      title: true
+      performers: true
+      version: false
+      instruments: false
+      moods: false
+      genre: true
+      subgenre: false
+      genre_sm: false
+      genre_sm2: false
+      tempo: false
+      bpm: false
+      leadvocalgender: false
+      situations: false
+      player: true
+      actioncolumn: true
+      feedback_rating: true
+      feedback_text: true 
+      feedback_others: false      
+  # add smintapi calls to gui
+  # the name will be displayed in the gui and the url will be used to retrieve the xml result
+  # e.g. https://localhost:12345/smint/tunesbagapi/sminttaggedapi.php?useexternal=false&tagged=true&taggedQueryType=reorderbyscore&id=
+  # you have to use the internal ids of smafe -> external=false
+  # the rest of the parameters configures the api
+  # the last parameter is the id (internal smafeid) including the equal sign without a space. e.g. 
+  # to DISABLE comment all urls
+  # reorder: "https://localhost:12345/smint/tunesbagapi/sminttaggedapi.php?useexternal=false&tagged=true&taggedQueryType=reorderbyscore&id="
+    smintapiurls:
+       # reorder: "https://localhost:12345/smint/tunesbagapi/sminttaggedapi.php?useexternal=false&tagged=true&taggedQueryType=reorderbyscore&id="
+       # filter: "https://localhost:12345/smint/tunesbagapi/sminttaggedapi.php?useexternal=false&tagged=true&taggedQueryType=filter&id="
+
+   #sets the number of results to view to the user
+   # a max of 100 and a default of 3 will be used if no or other values are given (see smintConfiguration.class.php) 
+    query_maxrelated:     6
+    query_enablenegation: false
+    query_enableoperator: false
+  # enable/disable graph link (true/false)
+    graphenabled:        false    
+    moreenabled:         false
+    
+# user group specific views can be defined by adding _userGroupName to the view option
+  view_spectAdmin:
+    options:
+      searchsimilar: true
+      searchleastsimilar: false
+      addtoquery: false
+    columns:
+      resultposition: false
+      tracknr: false
+      value: false
+      value_normalized: false 
+      featurevectorlink: false
+      title: true
+      performers: true
+      version: false
+      instruments: false
+      moods: false
+      genre: true
+      subgenre: false
+      genre_sm: false
+      genre_sm2: false
+      tempo: false
+      bpm: false
+      leadvocalgender: false
+      situations: false
+      player: true
+      actioncolumn: true
+      feedback_rating: true
+      feedback_text: true
+      feedback_others: false      
+  # add smintapi calls to gui
+  # the name will be displayed in the gui and the url will be used to retrieve the xml result
+  # e.g. https://localhost:12345/smint/tunesbagapi/sminttaggedapi.php?useexternal=false&tagged=true&taggedQueryType=reorderbyscore&id=
+  # you have to use the internal ids of smafe -> external=false
+  # the rest of the parameters configures the api
+  # the last parameter is the id (internal smafeid) including the equal sign without a space. e.g. 
+  # to DISABLE comment all urls
+  # reorder: "https://localhost:12345/smint/tunesbagapi/sminttaggedapi.php?useexternal=false&tagged=true&taggedQueryType=reorderbyscore&id="
+    smintapiurls:
+        #reorder: "https://localhost:12345/smint/tunesbagapi/sminttaggedapi.php?useexternal=false&tagged=true&taggedQueryType=reorderbyscore&id="
+        #filter: "https://localhost:12345/smint/tunesbagapi/sminttaggedapi.php?useexternal=false&tagged=true&taggedQueryType=filter&id="
+
+   #sets the number of results to view to the user
+   # a max of 100 and a default of 3 will be used if no or other values are given (see smintConfiguration.class.php) 
+    query_maxrelated:     6
+    query_enablenegation: true
+    query_enableoperator: true
+  # enable/disable graph link (true/false)
+    graphenabled:        false
+    moreenabled:         false
+
+# rename columns  
+  names:
+    columnnames:
+      resultposition: '#'
+      tracknr: 'tracknr'
+      value: 'dist'
+      value_normalized: 'norm' 
+      featurevectorlink: 'fv'
+      title: 'title'
+      performers: 'performers'
+      version: 'version'
+      instruments: 'instruments'
+      moods: 'moods'
+      genre: 'genre'
+      subgenre: 'subgenre'
+      genre_sm: 'genre_sm'
+      genre_sm2: 'genre_sm2'
+      tempo: 'tempoNotImpl'
+      bpm: 'bpm'
+      leadvocalgender: 'leadvocalgenderNotImpl'
+      situations: 'situationsNotImpl'
+      feedback_rating: 'rating'
+      feedback_text: 'comment' 
+      feedback_others: 'other comments' 
+      
+
+
+# parameters to transpose the distance into a weight to be used by the springgraph visualization
+# the first level is the featurevectortype_id 
+# the second level is the distancetype_id
+# default values will be used if no featurevectortype_id / distancetype_id matches 
+# $weight = pow ( $estimated_normalization_factor / $distanceValue, $exponent_e ) 
+  springgraph:
+    1:
+      1: 
+        exponent_e: 6
+        estimated_normalization_factor: 10000000
+      2: 
+        exponent_e: 6
+        estimated_normalization_factor: 500000000
+      5: 
+        exponent_e: 6
+        estimated_normalization_factor: 1
+    2:
+      1: 
+        exponent_e: 6
+        estimated_normalization_factor: 1000000
+      2: 
+        exponent_e: 6
+        estimated_normalization_factor: 200000000
+      5: 
+        exponent_e: 6
+        estimated_normalization_factor: 1
+    3:
+      1: 
+        exponent_e: 6
+        estimated_normalization_factor: 700000000
+      2: 
+        exponent_e: 6
+        estimated_normalization_factor: 3000000000
+      5: 
+        exponent_e: 6
+        estimated_normalization_factor: 1
+    4:
+      1: 
+        exponent_e: 6
+        estimated_normalization_factor: 1300000000
+      2: 
+        exponent_e: 6
+        estimated_normalization_factor: 4000000000
+      5: 
+        exponent_e: 6
+        estimated_normalization_factor: 1
+    6:
+      1: 
+        exponent_e: 6
+        estimated_normalization_factor: 130000000000
+      2: 
+        exponent_e: 6
+        estimated_normalization_factor: 500000000000
+      5: 
+        exponent_e: 6
+        estimated_normalization_factor: 1
+    default: 
+      exponent_e: 6
+      estimated_normalization_factor: 1
+
+    

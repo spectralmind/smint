@@ -1,0 +1,22 @@
+dev:
+  propel:
+    param:
+      classname: DebugPDO
+      debug: { realmemoryusage: true, details: { time: { enabled: true }, slow: { enabled: true, threshold: 0.1 }, mem: { enabled: true }, mempeak: { enabled: true }, memdelta: { enabled: true } } }
+test:
+  propel:
+    param:
+      classname: DebugPDO
+
+# -> don't forget to check featurevector-/distancetype settings in apps/smint/config/app.yml
+all:
+  propel:
+    class: sfPropelDatabase
+    param:
+      classname: PropelPDO
+      dsn: 'pgsql:host=localhost;dbname=pumpsmintnew'
+      username: smafeadmin
+      password: smafeadmin
+      encoding: utf8
+      persistent: true
+      pooling: true
